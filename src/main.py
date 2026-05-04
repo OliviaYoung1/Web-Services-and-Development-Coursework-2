@@ -17,15 +17,10 @@ import os
 sys.path.insert(0, os.path.dirname(__file__))
 
 from crawler import crawl, BASE_URL
+from indexer import build_index, save_index, INDEX_FILE
 
 BANNER = r"""
-  ____                      _     _____             _
- / ___|  ___  __ _ _ __ ___| |__ | ____|_ __   __ _(_)_ __   ___
- \___ \ / _ \/ _` | '__/ __| '_ \|  _| | '_ \ / _` | | '_ \ / _ \
-  ___) |  __/ (_| | | | (__| | | | |___| | | | (_| | | | | |  __/
- |____/ \___|\__,_|_|  \___|_| |_|_____|_| |_|\__, |_|_| |_|\___|
-                                               |___/
-  COMP3011 Search Engine  |  quotes.toscrape.com
+  Search Engine  |  quotes.toscrape.com
   Type 'help' for a list of commands.
 """
 
@@ -53,17 +48,23 @@ def parse_command(raw: str) -> tuple:
     return (parts[0].lower(), parts[1:])
 
 
-def cmd_build() -> None:
-    """Crawl the website and print how many pages were found."""
+def cmd_build() -> tuple:
+    """Crawl the website, build the index and save it to disk."""
     print(f"\n  Starting crawl of {BASE_URL} ...")
-    print(f"  (Politeness window: {6} s between requests)\n")
+    print(f"  (Politeness window: 6 s between requests)\n")
     pages = crawl(BASE_URL, verbose=True)
-    print(f"\n  Crawled {len(pages)} page(s).")
-    print("  [build] Indexing not yet implemented.")
+    print(f"\n  Crawled {len(pages)} page(s). Building index ...")
+    doc_index, inverted_index = build_index(pages)
+    print(f"  Index built: {len(doc_index)} pages, {len(inverted_index)} unique terms.")
+    save_index(doc_index, inverted_index, INDEX_FILE)
+    return doc_index, inverted_index
 
 
 def main() -> None:
     print(BANNER)
+
+    doc_index: dict = {}
+    inverted_index: dict = {}
 
     while True:
         try:
@@ -78,7 +79,7 @@ def main() -> None:
             continue
 
         if command == "build":
-            cmd_build()
+            doc_index, inverted_index = cmd_build()
         elif command == "load":
             print("  [load] Not yet implemented.")
         elif command == "print":
