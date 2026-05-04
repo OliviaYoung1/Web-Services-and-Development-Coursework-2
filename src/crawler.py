@@ -1,10 +1,11 @@
 """
-crawler.py - Single page fetcher for the Search Engine.
+crawler.py - Web crawler for the COMP3011 Search Engine.
 
 Provides functions to:
   - Fetch a single page and return a BeautifulSoup object
   - Extract internal links from a page
   - Extract visible text content from a page
+  - BFS crawl an entire website starting from a given URL
 
 Observes a politeness window of at least 6 seconds between requests
 as required by the coursework specification.
@@ -17,7 +18,7 @@ from urllib.parse import urljoin, urlparse
 
 
 BASE_URL = "https://quotes.toscrape.com"
-POLITENESS_DELAY = 6  # seconds between requests for politeness
+POLITENESS_DELAY = 6  # seconds between requests
 
 
 def get_page(url: str, session: requests.Session) -> BeautifulSoup | None:
@@ -61,3 +62,45 @@ def extract_text_content(soup: BeautifulSoup) -> str:
     for tag in soup(["script", "style", "noscript"]):
         tag.decompose()
     return soup.get_text(separator=" ")
+
+
+def crawl(start_url: str = BASE_URL, verbose: bool = True) -> dict[str, str]:
+    """
+    BFS crawl starting from start_url.
+    Visits every reachable internal page exactly once.
+    Observes a politeness delay of POLITENESS_DELAY seconds between requests.
+
+    Returns a dict mapping URL -> raw page text for all pages visited.
+    """
+    visited: set[str] = set()
+    queue: list[str] = [start_url]
+    pages: dict[str, str] = {}
+
+    session = requests.Session()
+    session.headers.update({"User-Agent": "COMP3011-SearchBot/1.0"})
+
+    while queue:
+        url = queue.pop(0)
+        if url in visited:
+            continue
+
+        visited.add(url)
+        if verbose:
+            print(f"  Crawling [{len(visited)}]: {url}")
+
+        soup = get_page(url, session)
+        if soup is None:
+            continue
+
+        text = extract_text_content(soup)
+        pages[url] = text
+
+        for link in extract_links(soup, BASE_URL):
+            if link not in visited and link not in queue:
+                queue.append(link)
+
+        # Politeness window: only sleep if there is a next request to make
+        if queue:
+            time.sleep(POLITENESS_DELAY)
+
+    return pages

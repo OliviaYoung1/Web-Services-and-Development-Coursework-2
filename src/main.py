@@ -12,9 +12,20 @@ Commands:
 """
 
 import sys
+import os
+
+sys.path.insert(0, os.path.dirname(__file__))
+
+from crawler import crawl, BASE_URL
 
 BANNER = r"""
-  Search Engine  |  quotes.toscrape.com
+  ____                      _     _____             _
+ / ___|  ___  __ _ _ __ ___| |__ | ____|_ __   __ _(_)_ __   ___
+ \___ \ / _ \/ _` | '__/ __| '_ \|  _| | '_ \ / _` | | '_ \ / _ \
+  ___) |  __/ (_| | | | (__| | | | |___| | | | (_| | | | | |  __/
+ |____/ \___|\__,_|_|  \___|_| |_|_____|_| |_|\__, |_|_| |_|\___|
+                                               |___/
+  COMP3011 Search Engine  |  quotes.toscrape.com
   Type 'help' for a list of commands.
 """
 
@@ -42,6 +53,15 @@ def parse_command(raw: str) -> tuple:
     return (parts[0].lower(), parts[1:])
 
 
+def cmd_build() -> None:
+    """Crawl the website and print how many pages were found."""
+    print(f"\n  Starting crawl of {BASE_URL} ...")
+    print(f"  (Politeness window: {6} s between requests)\n")
+    pages = crawl(BASE_URL, verbose=True)
+    print(f"\n  Crawled {len(pages)} page(s).")
+    print("  [build] Indexing not yet implemented.")
+
+
 def main() -> None:
     print(BANNER)
 
@@ -58,7 +78,7 @@ def main() -> None:
             continue
 
         if command == "build":
-            print("  [build] Not yet implemented.")
+            cmd_build()
         elif command == "load":
             print("  [load] Not yet implemented.")
         elif command == "print":
