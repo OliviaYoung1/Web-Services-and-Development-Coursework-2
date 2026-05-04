@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-main.py - Command-line shell for the Search Engine Tool.
+main.py - Command-line shell for the COMP3011 Search Engine Tool.
 
 Commands:
   build          Crawl the website, build and save the index.
