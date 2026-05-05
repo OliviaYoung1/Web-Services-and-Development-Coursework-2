@@ -18,6 +18,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 from crawler import crawl, BASE_URL
 from indexer import build_index, save_index, load_index, INDEX_FILE
+from search import find_pages, print_postings
 
 BANNER = r"""
   Search Engine  |  quotes.toscrape.com
@@ -68,6 +69,15 @@ def cmd_load() -> tuple:
         print(f"  [ERROR] {e}")
         return {}, {}
 
+def cmd_print(doc_index: dict, inverted_index: dict, args: list) -> None:
+    if not args:
+        print("  Usage: print <word>")
+        return
+    if not inverted_index:
+        print("  [ERROR] No index loaded. Run 'build' or 'load' first.")
+        return
+    print_postings(doc_index, inverted_index, args[0])
+
 
 def main() -> None:
     print(BANNER)
@@ -95,7 +105,7 @@ def main() -> None:
             if not args:
                 print("  Usage: print <word>")
             else:
-                print("  [print] Not yet implemented.")
+                cmd_print(doc_index, inverted_index, args)
         elif command == "find":
             if not args:
                 print("  Usage: find <word> [word2] ...")
