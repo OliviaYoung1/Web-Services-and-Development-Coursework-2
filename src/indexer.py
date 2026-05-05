@@ -100,3 +100,25 @@ def save_index(doc_index: dict, inverted_index: dict, filepath: str = INDEX_FILE
     with path.open("w", encoding="utf-8") as f:
         json.dump(payload, f, indent=2, ensure_ascii=False)
     print(f"  Index saved to '{filepath}' ({path.stat().st_size // 1024} KB).")
+
+
+def load_index(filepath: str = INDEX_FILE) -> tuple:
+    """
+    Load and return (doc_index, inverted_index) from a JSON file.
+    Raises FileNotFoundError if the file does not exist.
+    """
+    path = Path(filepath)
+    if not path.exists():
+        raise FileNotFoundError(
+            f"Index file '{filepath}' not found. Run 'build' first."
+        )
+    with path.open("r", encoding="utf-8") as f:
+        payload = json.load(f)
+
+    doc_index = payload["doc_index"]
+    inverted_index = payload["inverted_index"]
+    print(
+        f"  Index loaded from '{filepath}' "
+        f"({len(doc_index)} pages, {len(inverted_index)} unique terms)."
+    )
+    return doc_index, inverted_index

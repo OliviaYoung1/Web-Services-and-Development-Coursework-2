@@ -17,7 +17,7 @@ import os
 sys.path.insert(0, os.path.dirname(__file__))
 
 from crawler import crawl, BASE_URL
-from indexer import build_index, save_index, INDEX_FILE
+from indexer import build_index, save_index, load_index, INDEX_FILE
 
 BANNER = r"""
   Search Engine  |  quotes.toscrape.com
@@ -60,6 +60,15 @@ def cmd_build() -> tuple:
     return doc_index, inverted_index
 
 
+def cmd_load() -> tuple:
+    """Load a previously saved index from disk."""
+    try:
+        return load_index(INDEX_FILE)
+    except FileNotFoundError as e:
+        print(f"  [ERROR] {e}")
+        return {}, {}
+
+
 def main() -> None:
     print(BANNER)
 
@@ -81,7 +90,7 @@ def main() -> None:
         if command == "build":
             doc_index, inverted_index = cmd_build()
         elif command == "load":
-            print("  [load] Not yet implemented.")
+            doc_index, inverted_index = cmd_load()
         elif command == "print":
             if not args:
                 print("  Usage: print <word>")

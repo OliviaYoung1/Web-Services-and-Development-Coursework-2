@@ -6,19 +6,20 @@ Tests cover:
                 minimum token length
   - build_index(): doc ID assignment, inverted index structure,
                    frequency and position recording
-
-load_index() is not tested here - that comes in the next commit.
+  - save_index() / load_index(): round-trip persistence to JSON
 
 Run from the repo root with:  python -m pytest tests/ -v
 """
 
 import unittest
-import sys
+import json
+import tempfile
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from indexer import tokenise, build_index, STOPWORDS
+from indexer import tokenise, build_index, save_index, load_index, STOPWORDS
 
 
 SAMPLE_PAGES = {
@@ -95,7 +96,6 @@ class TestBuildIndex(unittest.TestCase):
             self.assertTrue(key.isdigit(), f"Expected numeric string, got: {key}")
 
     def test_inverted_index_uses_doc_ids_not_urls(self):
-        # Postings must contain doc IDs (numeric strings), not raw URLs
         for word, postings in self.inverted_index.items():
             for key in postings:
                 self.assertTrue(
@@ -158,6 +158,44 @@ class TestBuildIndex(unittest.TestCase):
         for word, postings in self.inverted_index.items():
             for doc_id, stats in postings.items():
                 self.assertEqual(stats["freq"], len(stats["positions"]))
+
+
+class TestSaveAndLoadIndex(unittest.TestCase):
+    """Tests for the save_index() and load_index() round-trip."""
+
+    def setUp(self):
+        self.doc_index, self.inverted_index = build_index(SAMPLE_PAGES)
+        # Use a temp file so tests don't write to the real data/ directory
+        self.tmp = tempfile.NamedTemporaryFile(suffix=".json", delete=False)
+        self.tmp.close()
+
+    def tearDown(self):
+        os.unlink(self.tmp.name)
+
+    def test_save_creates_file(self):
+        save_index(self.doc_index, self.inverted_index, self.tmp.name)
+        self.assertTrue(os.path.exists(self.tmp.name))
+
+    def test_save_produces_valid_json(self):
+        save_index(self.doc_index, self.inverted_index, self.tmp.name)
+        with open(self.tmp.name) as f:
+            data = json.load(f)
+        self.assertIn("doc_index", data)
+        self.assertIn("inverted_index", data)
+
+    def test_round_trip_preserves_doc_index(self):
+        save_index(self.doc_index, self.inverted_index, self.tmp.name)
+        loaded_doc, _ = load_index(self.tmp.name)
+        self.assertEqual(self.doc_index, loaded_doc)
+
+    def test_round_trip_preserves_inverted_index(self):
+        save_index(self.doc_index, self.inverted_index, self.tmp.name)
+        _, loaded_inv = load_index(self.tmp.name)
+        self.assertEqual(self.inverted_index, loaded_inv)
+
+    def test_load_missing_file_raises(self):
+        with self.assertRaises(FileNotFoundError):
+            load_index("/tmp/definitely_does_not_exist_xyzabc.json")
 
 
 if __name__ == "__main__":
