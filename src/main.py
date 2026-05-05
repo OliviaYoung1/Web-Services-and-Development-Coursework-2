@@ -91,7 +91,6 @@ def cmd_find(doc_index: dict, inverted_index: dict, args: list) -> None:
     for rank, (url, score) in enumerate(results, start=1):
         print(f"  {rank:>3}. [score={score:.2f}]  {url}")
     print()
-
     
 def main() -> None:
     print(BANNER)
