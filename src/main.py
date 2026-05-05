@@ -70,15 +70,29 @@ def cmd_load() -> tuple:
         return {}, {}
 
 def cmd_print(doc_index: dict, inverted_index: dict, args: list) -> None:
-    if not args:
-        print("  Usage: print <word>")
-        return
     if not inverted_index:
         print("  [ERROR] No index loaded. Run 'build' or 'load' first.")
         return
     print_postings(doc_index, inverted_index, args[0])
 
+def cmd_find(doc_index: dict, inverted_index: dict, args: list) -> None:
+    if not inverted_index:
+        print("  [ERROR] No index loaded. Run 'build' or 'load' first.")
+        return
 
+    query = " ".join(args)
+    results = find_pages(doc_index, inverted_index, query)
+
+    if not results:
+        print(f"\n  No pages found for query: '{query}'\n")
+        return
+
+    print(f"\n  Results for '{query}' — {len(results)} page(s) found:\n")
+    for rank, (url, score) in enumerate(results, start=1):
+        print(f"  {rank:>3}. [score={score:.2f}]  {url}")
+    print()
+
+    
 def main() -> None:
     print(BANNER)
 
@@ -110,7 +124,7 @@ def main() -> None:
             if not args:
                 print("  Usage: find <word> [word2] ...")
             else:
-                print("  [find] Not yet implemented.")
+                cmd_find(doc_index, inverted_index, args)
         elif command in ("help", "?"):
             show_help()
         elif command in ("exit", "quit", "q"):
