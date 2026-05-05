@@ -26,7 +26,9 @@ import re
 import json
 from pathlib import Path
 
-INDEX_FILE = "../data/index.json"
+BASE_DIR = Path(__file__).resolve().parent.parent
+DATA_DIR = BASE_DIR / "data"
+INDEX_FILE = DATA_DIR / "index.json"
 
 # Common English stopwords (L11, Slides 15-16).
 # These words have little meaning in isolation and are excluded from the index.
@@ -92,25 +94,21 @@ def build_index(pages: dict) -> tuple:
     return doc_index, inverted_index
 
 
-def save_index(doc_index: dict, inverted_index: dict, filepath: str = INDEX_FILE) -> None:
-    """Serialise both the doc_index and inverted_index to a single JSON file."""
+
+def save_index(doc_index: dict, inverted_index: dict, filepath: Path = INDEX_FILE) -> None:
     path = Path(filepath)
     path.parent.mkdir(parents=True, exist_ok=True)
     payload = {"doc_index": doc_index, "inverted_index": inverted_index}
     with path.open("w", encoding="utf-8") as f:
         json.dump(payload, f, indent=2, ensure_ascii=False)
-    print(f"  Index saved to '{filepath}' ({path.stat().st_size // 1024} KB).")
+    print(f"  Index saved to '{path}' ({path.stat().st_size // 1024} KB).")
 
 
-def load_index(filepath: str = INDEX_FILE) -> tuple:
-    """
-    Load and return (doc_index, inverted_index) from a JSON file.
-    Raises FileNotFoundError if the file does not exist.
-    """
+def load_index(filepath: Path = INDEX_FILE) -> tuple:
     path = Path(filepath)
     if not path.exists():
         raise FileNotFoundError(
-            f"Index file '{filepath}' not found. Run 'build' first."
+            f"Index file '{path}' not found. Run 'build' first."
         )
     with path.open("r", encoding="utf-8") as f:
         payload = json.load(f)
@@ -118,7 +116,7 @@ def load_index(filepath: str = INDEX_FILE) -> tuple:
     doc_index = payload["doc_index"]
     inverted_index = payload["inverted_index"]
     print(
-        f"  Index loaded from '{filepath}' "
+        f"  Index loaded from '{path}' "
         f"({len(doc_index)} pages, {len(inverted_index)} unique terms)."
     )
     return doc_index, inverted_index
