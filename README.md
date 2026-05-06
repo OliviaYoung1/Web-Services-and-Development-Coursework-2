@@ -25,8 +25,8 @@ Key features:
  
 1. Clone the repository:
 ```bash
-git clone https://github.com/your-username/COMP3011--coursework-2.git
-cd COMP3011--coursework-2
+git clone https://github.com/OliviaYoung1/Web-Services-and-Development-Coursework-2
+cd Web-Services-and-Development-Coursework-2
 ```
  
 2. Install dependencies:
