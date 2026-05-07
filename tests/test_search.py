@@ -1,4 +1,7 @@
 """
+This code was created with help from Claude AI (Anthropic), in accordance with the Green GenAI rating.
+All code was checked, verified and editied by me before implementing.
+
 test_search.py - Unit tests for search.py
 
 Run from the repo root with:  python -m pytest tests/ -v

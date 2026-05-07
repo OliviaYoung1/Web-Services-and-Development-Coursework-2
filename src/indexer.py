@@ -1,4 +1,7 @@
 """
+This code was created with help from Claude AI (Anthropic), in accordance with the Green GenAI rating.
+All code was checked, verified and editied by me before implementing.
+
 indexer.py - Builds and stores an inverted index.
 
 Design follows Lecture 12 (COMP3011):

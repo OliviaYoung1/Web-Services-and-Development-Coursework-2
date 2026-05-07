@@ -1,4 +1,7 @@
 """
+This code was created with help from Claude AI (Anthropic), in accordance with the Green GenAI rating.
+All code was checked, verified and editied by me before implementing.
+
 search.py - Query processing and ranked retrieval.
 
 Implements conjunctive (AND) processing as described in Lecture 13 Slide 10:

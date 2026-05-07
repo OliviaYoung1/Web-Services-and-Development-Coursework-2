@@ -248,3 +248,10 @@ Multi-term queries rank pages by the sum of TF × smoothed-IDF across all query 
  
 ### Politeness
 `time.sleep(6)` is called between every consecutive HTTP request, only when there is a next URL to fetch, avoiding an unnecessary delay at the end of the crawl.
+
+---
+ 
+## GenAI Decleration
+
+I acknowledge the use of Claude Sonnet 4.6 (Anthropic, https://claude.ai) to support this coursework, aligning with the information that we were allowed to use any AI tool on the Teams page. I used it to assist with planning the incremental development structure, generating initial versions of the crawler, indexer, search, and test files, debugging issues in the TF-IDF scoring logic and index file path resolution, drafting inline code comments, and generating the README and video demonstration script. I also used it to generate the PowerPoint slides for the GenAI critical evaluation section of the video demonstration.
+All AI-generated code and content was reviewed, tested, and adapted by me before implementation. Where AI suggestions did not align with the module's taught material, including the inverted index structure (Lecture 12), stopword removal (Lecture 11), and the development and testing workflow, I identified the discrepancies, pushed back, and corrected them myself.
